@@ -1,0 +1,54 @@
+When I look at RxJava, it is the things I already know that it is like that
+comes to mind. MapReduce in MongoDB (for map and reduce [aka fold]), Stream or
+List and its operators. Even SQL bears some similarity, with options like sorts,
+limits, group by, aggregates (like count(*)), and other features.
+
+The similarites to Functionl programming are stronger though, with the wealth of
+operators. Anyone familiar with Scala, Haskell, or similar languages, will
+recognize map, reduce (fold), take, takeWhile, drop, dropWhile, the latter two
+called skip and skipWhile in RxJava.
+
+So, it is where things are different that gotchas show up. For example, Maybe is
+obvious if a person knows Haskell, where Maybe<T> has two derived types of Nothing
+and Just(t) (written here in Java like syntax for readability). In other
+langues, like Scala and Google's popular Optional from Guava, where the
+constructor Optional(t) can produce Some(t) if not null, and None if the value
+is none, providing a different form of null safety. I talk about this to point
+out why Completable goes against expectation. Completable sounds, at least to
+me, like it should be a Promise, which is completed by work from one thread to
+make it available to a Future in another Thread. It is a simple form of IPC
+intended for simple values, and allows for communicating failure (Scala has it
+as Future<T> which has Success(t) and Failure(e:Throwable)).
+
+Another surprise is that back pressure isn't assumed to be a property of a
+reactive system. When I was first learning about reactive systems, one of the
+things that differentiated from most existing formats was the difference between
+backpressure systems and push or pull systems. In push systems, the server
+pushes information to the client, regardless of the client capacity for
+information. For example, requesting a large document from an http site for
+saving to a drive could lead to a client crash if the data was downloaded faster
+than it was written to disk, leading to overconsumption of memory. Even if that
+didn't happen, in older systems the data might end up in virtual memory, itself
+hard drive memory, making the process take even longer as it was written to disk
+as virtual memory pages, read back into memory, and then written to disk,
+leading to overall system slow downs. Reactive compromised on this by allowing
+clients to inform a server they had room for more data, so the server only
+produced or sent as much data as the client could handle at a time. Further, a
+client could request data while still processing, so it could have more data to
+process before finishing its current batch, leading to a situation where memory
+could be memorized, and threads could be maximized, without necessarily losing
+data (although, if a client doesn't consume in a timely manner, it is possible
+the server may have to drop data to maintain rates, depending on the type of
+data and implementation). Of course, my initial learning was from the Reactive
+Manifesto, which apparently isn't the defining document of RxJava or modern
+reactive programming. This seems unnecessarily confusing, naming wise. However,
+the concepts of applying transforms to streams of data is easy to wrap my head around.
+
+The components that seem most important for me to learn, rather than adapt
+previous knowledge to, is the mechanisms that make this system different from
+Akka-Streams, which was part of the Reactive systems I had learned before (which
+also provided streams that could be acted on), DisposableComposite, which
+is very different from anything I've used before, and best practices for
+distributing information to applications. I look forward to mastering the
+intracacies of RxJava as my career advances to provide a good user experience
+through proper application of these new technologies.
